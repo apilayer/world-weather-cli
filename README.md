@@ -26,4 +26,6 @@ npx world-weather
 
 The tool will prompt for a city or location name, call `http://api.weatherstack.com/forecast`, and then print the current readings plus the next few days of forecast data. If your Weatherstack plan does not include the forecast endpoint, the CLI automatically falls back to the current-conditions endpoint and will let you know that forecast data is unavailable.
 
+You can find the complete Weatherstack API reference, quickstart, and plan details at [https://weatherstack.com/documentation](https://weatherstack.com/documentation).
+
 If you want to experiment without hitting the API, store any sample Weatherstack response locally and inspect it with `jq` or another JSON viewer.
