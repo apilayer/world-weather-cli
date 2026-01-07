@@ -1,5 +1,7 @@
 # World Weather CLI
 
+![World Weather CLI screenshot](./screenshot.jpg)
+
 Interactive Node.js command-line tool that fetches current conditions and a short forecast from the [Weatherstack](https://weatherstack.com/) API, then displays the results with colorized, readable formatting.
 
 ## Get Started
