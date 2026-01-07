@@ -7,6 +7,9 @@ const { URLSearchParams } = require('url');
 
 const API_BASE_URL = 'http://api.weatherstack.com';
 const DEFAULT_FORECAST_DAYS = 3;
+const FORCE_CURRENT =
+  process.env.WEATHERSTACK_FORCE_CURRENT === '1' ||
+  process.env.WEATHERSTACK_FORCE_CURRENT === 'true';
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -81,6 +84,10 @@ function formatDescription(hourly = []) {
   return slot ? slot.weather_descriptions[0] : 'N/A';
 }
 
+function delay(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 function printForecast(forecast = {}) {
   const dates = forecast ? Object.keys(forecast).sort() : [];
   if (!dates.length) {
@@ -131,21 +138,27 @@ async function main() {
   try {
     console.log(chalk.gray('\nFetching weather data...'));
     let data;
-    try {
-      data = await fetchWeather(city, apiKey, 'forecast');
-    } catch (err) {
-      const planLimit =
-        err.message &&
-        /plan does not support weather forecast data|upgrade your account/i.test(err.message);
-      if (!planLimit) {
-        throw err;
-      }
-      console.log(
-        chalk.yellow(
-          '\nYour current subscription does not provide forecast data. Showing current conditions only.'
-        )
-      );
+    if (FORCE_CURRENT) {
       data = await fetchWeather(city, apiKey, 'current');
+    } else {
+      try {
+        data = await fetchWeather(city, apiKey, 'forecast');
+      } catch (err) {
+        const planLimit =
+          err.message &&
+          /plan does not support weather forecast data|upgrade your account/i.test(err.message);
+        if (!planLimit) {
+          throw err;
+        }
+        console.log(
+          chalk.yellow(
+            '\nYour current subscription does not provide forecast data. Showing current conditions only.'
+          )
+        );
+        // Avoid rapid back-to-back calls that can trip strict rate limits.
+        await delay(1100);
+        data = await fetchWeather(city, apiKey, 'current');
+      }
     }
     printCurrent(data.current, data.location);
     printForecast(data.forecast);

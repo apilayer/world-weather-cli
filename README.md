@@ -26,6 +26,12 @@ npm install
 export WEATHERSTACK_API_KEY=your_access_key_here
 ```
 
+Optionally, if your plan does not support forecasts (or you want to reduce API calls), skip the forecast endpoint entirely:
+
+```bash
+export WEATHERSTACK_FORCE_CURRENT=1
+```
+
 ### 4. Run the CLI
 
 ```bash
